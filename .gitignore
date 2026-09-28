@@ -1,0 +1,7 @@
+# Generated on first run: partial clone of the CSL styles repo plus its index
+# and blob cache. Nothing here is hand-written; delete it and `jst` rebuilds it.
+data/
+
+__pycache__/
+*.pyc
+.DS_Store
