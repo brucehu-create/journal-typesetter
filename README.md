@@ -142,7 +142,7 @@ python tests/test_docx_build.py
 ## 用法
 
 ```bash
-cd D:/datas/agent_local/output_files/32_Journal_Typesetter
+cd journal-typesetter          # 本仓库根目录
 
 python -m jst resolve-csl "Nature Medicine"          # 解出文献样式
 python -m jst resolve-csl "中华医学杂志" --json       # JSON 输出
@@ -164,17 +164,25 @@ python -m jst refresh-index                          # 重建样式索引
 ## 目录
 
 ```
-32_Journal_Typesetter/
+journal-typesetter/
 ├── jst/
 │   ├── csl_index.py    # 刊名 → CSL 样式。完成并实测。
 │   ├── guidelines.py   # 须知抓取 + 来源留痕。完成，字段提取交由 skill。
 │   ├── compliance.py   # 计数核对 + 合规矩阵。完成并实测。
-│   ├── docx_build.py   # docx 重排，保留 Zotero 域。完成并实测。
+│   ├── docx_build.py   # docx 重排，保留 Zotero 域 + 字色归黑。完成并实测。
 │   ├── cli.py          # 命令行入口。完成。
 │   └── zotero_docx.py  # 接口占位（本方案不需要它，见上一节）。
 ├── tests/
-│   └── test_docx_build.py  # 回归测试，含 Zotero 域存活不变量
-└── data/               # 样式库 partial clone、索引与 blob 缓存（可删，会重建）
+│   └── test_docx_build.py  # 回归测试（11 项），含 Zotero 域存活不变量
+├── skill/
+│   └── journal-typesetter-SKILL.md  # 配套 skill：判断层（找须知、定顺序、填卡片）
+└── data/               # 首次运行自动生成：CSL 样式库 partial clone、索引与缓存
+```
+
+配套 skill 放在 `skill/` 下，用法是把它拷进你的项目或全局 skills 目录：
+
+```bash
+cp skill/journal-typesetter-SKILL.md ~/.claude/skills/journal-typesetter/SKILL.md
 ```
 
 ## 待办
@@ -188,4 +196,16 @@ python -m jst refresh-index                          # 重建样式索引
 
 ## 依赖
 
-`requests`、`pyyaml`、`python-docx`（均已在环境内）、`git`。**不需要 pandoc**（MVP 不走 LaTeX 渲染路径）。
+```bash
+pip install requests pyyaml python-docx
+# pyzotero 仅有 Zotero 集成需求时需要
+```
+
+`git` 需在 PATH 上（用于拉取 CSL 样式库）。**不需要 pandoc**（不走 LaTeX 渲染路径）。
+
+首次运行任意命令时会自动拉取 CSL 样式库——一个 `--depth 1 --filter=blob:none` 的
+partial clone，约 419 KB，放在 `data/` 下。该目录已在 `.gitignore` 中，删掉会自动重建。
+
+## 许可
+
+代码 MIT；配套 skill CC-BY-4.0。
